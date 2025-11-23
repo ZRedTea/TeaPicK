@@ -1,0 +1,6 @@
+[project]
+name = "TeaPicK"
+version = "0.2.1"
+dependencies = [
+    "colorlog>=6.9.0",
+]
