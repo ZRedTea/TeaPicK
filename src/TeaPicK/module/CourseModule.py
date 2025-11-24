@@ -1,9 +1,9 @@
 from requests import Session
 
-from src.TeaCOPER.utils.ConfigUtil import ConfigUtil
-from src.TeaCOPER.utils.CourseIdUtil import CourseIdUtil
+from TeaPicK.utils.ConfigUtil import ConfigUtil
+from TeaPicK.utils.CourseIdUtil import CourseIdUtil
 
-from src.TeaCOPER.manager.LogManager import LogManager
+from TeaPicK.manager.LogManager import LogManager
 
 class CourseModule:
     """

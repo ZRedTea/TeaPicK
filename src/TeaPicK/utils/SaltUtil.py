@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 from requests import Session
 
-from src.TeaCOPER.manager.LogManager import LogManager
+from TeaPicK.manager.LogManager import LogManager
 
 logger = LogManager("工具组件")
 

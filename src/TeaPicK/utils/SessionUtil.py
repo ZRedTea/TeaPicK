@@ -1,7 +1,7 @@
 import requests
 from requests import Session
 
-from src.TeaCOPER.utils.ConfigUtil import ConfigUtil
+from TeaPicK.utils.ConfigUtil import ConfigUtil
 
 class SessionUtil:
     """

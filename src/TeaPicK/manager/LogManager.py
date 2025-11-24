@@ -6,8 +6,8 @@ import os
 from PyQt6.QtCore import QObject, pyqtSignal as Signal
 from PyQt6.QtWidgets import QTextBrowser
 
-from src.TeaCOPER.GUI.QTextEditLogHandler import QTextEditLogHandler
-from src.TeaCOPER.utils.ConfigUtil import ConfigUtil
+from TeaPicK.GUI.QTextEditLogHandler import QTextEditLogHandler
+from TeaPicK.utils.ConfigUtil import ConfigUtil
 
 CRITI = 50
 ERROR = 40

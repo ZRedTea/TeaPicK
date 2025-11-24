@@ -1,7 +1,8 @@
 import threading
 from queue import Queue
 from typing import List, Dict
-from src.TeaCOPER.model import Course, Session
+
+from TeaPicK.model import Course, Session
 
 
 class WorkerThread(threading.Thread):

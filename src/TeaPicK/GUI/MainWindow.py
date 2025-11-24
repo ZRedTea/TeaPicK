@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (QMainWindow, QVBoxLayout, QHBoxLayout,
                              QPushButton, QListWidget, QTextEdit, QWidget,
                              QLabel, QProgressBar)
 from PyQt6.QtCore import QTimer
-from src.TeaCOPER.thread import ControlThread
+from TeaPicK.thread import ControlThread
 
 
 class MainWindow(QMainWindow):

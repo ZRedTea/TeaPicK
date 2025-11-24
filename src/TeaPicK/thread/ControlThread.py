@@ -4,12 +4,11 @@ import time
 from typing import List, Dict, Any
 from PyQt6.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot
 
-from src.TeaCOPER.manager import LogManager
-from src.TeaCOPER.module import SelectModule
-from src.TeaCOPER.model import Course
-from src.TeaCOPER.thread import WorkerThread
-from src.TeaCOPER.utils import SessionUtil
-from src.TeaCOPER.utils import ConfigUtil
+from TeaPicK.manager import LogManager
+from TeaPicK.module import SelectModule
+from TeaPicK.model import Course
+from TeaPicK.thread import WorkerThread
+from TeaPicK.utils import SessionUtil, ConfigUtil
 
 logger = LogManager("控制线程")
 
@@ -58,9 +57,8 @@ class ControlThread(QObject, threading.Thread):
                 logger.error(e)
 
     def _start_workers(self):
-        from src.TeaCOPER.module import SelectModule
-        from src.TeaCOPER.module import LoginModule
-
+        from ..module import SelectModule
+        from ..module import LoginModule
 
         # 初始化session
         logger.info("正在获取会话")

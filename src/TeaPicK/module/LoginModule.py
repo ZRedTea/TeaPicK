@@ -2,10 +2,10 @@ import hashlib
 import logging
 
 from requests import Session
-from src.TeaCOPER.utils.SaltUtil import SaltUtil
-from src.TeaCOPER.utils.ConfigUtil import ConfigUtil
+from TeaPicK.utils.SaltUtil import SaltUtil
+from TeaPicK.utils.ConfigUtil import ConfigUtil
 
-from src.TeaCOPER.manager.LogManager import LogManager
+from TeaPicK.manager.LogManager import LogManager
 
 class LoginModule:
     """

@@ -2,11 +2,11 @@ import time
 
 from src.TeaPicK.utils.SessionUtil import SessionUtil
 
-from modules.SelectModule import SelectModule
-from modules.LoginModule import LoginModule
-from modules.CourseModule import CourseModule
+from module.SelectModule import SelectModule
+from module.LoginModule import LoginModule
+from module.CourseModule import CourseModule
 
-from managers.LogManager import LogManager
+from manager.LogManager import LogManager
 
 def run():
     logger = LogManager("中央控件")

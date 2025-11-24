@@ -4,9 +4,9 @@ import os
 import json
 import re
 
-from src.TeaCOPER.utils.ConfigUtil import ConfigUtil
+from TeaPicK.utils.ConfigUtil import ConfigUtil
 
-from src.TeaCOPER.model.Course import CourseModel
+from TeaPicK.model.Course import CourseModel
 
 class CourseIdUtil:
     @staticmethod

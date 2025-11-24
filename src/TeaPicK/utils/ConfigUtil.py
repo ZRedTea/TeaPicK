@@ -2,7 +2,7 @@ import configparser
 import json
 import os
 
-from src.TeaCOPER.model.Course import CourseModel
+from TeaPicK.model.Course import CourseModel
 
 class ConfigUtil:
     """
