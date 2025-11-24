@@ -1,7 +1,7 @@
 import requests
 from requests import Session
 
-from src.TeaPicK.utils.ConfigUtil import ConfigUtil
+from src.TeaCOPER.utils.ConfigUtil import ConfigUtil
 
 class SessionUtil:
     """
@@ -24,13 +24,13 @@ class SessionUtil:
 
         :return: sessionAfterInit
         """
-        url = ConfigUtil.readConfigFile("websiteConfig.ini", "website")["loginurl"]
+        url = ConfigUtil.readConfigFile("website")["loginurl"]
         headers = {
-            "Connection" : ConfigUtil.readConfigFile("sessionConfig.ini", "index-headers")["connection"],
+            "Connection" : ConfigUtil.readConfigFile("index-headers")["connection"],
             "Host" : "jwxt.sias.edu.cn",
             "Origin" : "https://jwxt.sias.edu.cn",
-            "User-Agent" : ConfigUtil.readConfigFile("sessionConfig.ini", "index-headers")["user-agent"],
-            "Referer" : ConfigUtil.readConfigFile("sessionConfig.ini", "index-headers")["referer"],
+            "User-Agent" : ConfigUtil.readConfigFile("index-headers")["user-agent"],
+            "Referer" : ConfigUtil.readConfigFile("index-headers")["referer"],
         }
         session.headers = headers
         # print(session.cookies)

@@ -1,11 +1,12 @@
+import requests
 from requests import Session
 import os
 import json
 import re
 
-from src.TeaPicK.utils.ConfigUtil import ConfigUtil
+from src.TeaCOPER.utils.ConfigUtil import ConfigUtil
 
-from src.TeaPicK.models.CourseModel import CourseModel
+from src.TeaCOPER.model.Course import CourseModel
 
 class CourseIdUtil:
     @staticmethod
@@ -50,8 +51,8 @@ class CourseIdUtil:
 
     @staticmethod
     def getCourseJson(session : Session):
-        url = ConfigUtil.readConfigFile("websiteConfig.ini", "website")["coursedataurl"]
-        profileId = ConfigUtil.readConfigFile("websiteConfig.ini", "website")["profile"]
+        url = ConfigUtil.readConfigFile("website")["coursedataurl"]
+        profileId = ConfigUtil.readConfigFile("website")["profile"]
         url = url + profileId
 
         ThisSession = session

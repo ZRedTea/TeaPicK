@@ -1,10 +1,11 @@
 import hashlib
+import logging
 
 from requests import Session
-from src.TeaPicK.utils.SaltUtil import SaltUtil
-from src.TeaPicK.utils.ConfigUtil import ConfigUtil
+from src.TeaCOPER.utils.SaltUtil import SaltUtil
+from src.TeaCOPER.utils.ConfigUtil import ConfigUtil
 
-from src.TeaPicK.managers.LogManager import LogManager
+from src.TeaCOPER.manager.LogManager import LogManager
 
 class LoginModule:
     """
@@ -14,9 +15,9 @@ class LoginModule:
     def __init__(self, session : Session):
         self.logger = LogManager("登录模块")
         self.session = session
-        self.url = ConfigUtil.readConfigFile("websiteConfig.ini", "website")["loginurl"]
-        self.__username = ConfigUtil.readConfigFile("userConfig.ini", "user")["username"],
-        self.__password = ConfigUtil.readConfigFile("userConfig.ini", "user")["password"]
+        self.url = ConfigUtil.readConfigFile("website")["loginurl"]
+        self.__username = ConfigUtil.readConfigFile("user")["username"],
+        self.__password = ConfigUtil.readConfigFile("user")["password"]
 
         self.params = {
             "username" : self.__username,

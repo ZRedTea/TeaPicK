@@ -2,7 +2,7 @@ import configparser
 import json
 import os
 
-from src.TeaPicK.models.CourseModel import CourseModel
+from src.TeaCOPER.model.Course import CourseModel
 
 class ConfigUtil:
     """
@@ -13,36 +13,18 @@ class ConfigUtil:
     parent_dir = os.path.dirname(current_dir)
 
     @staticmethod
-    def readConfigFile(filePath : str, configType : str):
+    def readConfigFile(configType : str):
         """
         读取配置文件中的内容并转换为字典
-        :param filePath:
+        但只返回某一
         :param configType:
 
         :return: configToDict
         """
-        filePath = os.path.join(ConfigUtil.parent_dir, 'config', filePath)
-        # print(filePath)
+        filePath = os.path.join(ConfigUtil.parent_dir, 'config', "config.toml")
         cfg = configparser.ConfigParser()
-        cfg.read(filePath,encoding='utf-8')
-        # print(cfg.items(configType))
-        # print(dict(cfg.items(configType)))
+        cfg.read(filePath)
         return dict(cfg.items(configType))
-
-    @staticmethod
-    def readListConfigFile(filePath : str, configType : str):
-        """
-        读取配置文件中的列表内容并转换为列表
-        :param filePath:
-        :param configType:
-
-        :return: configToList
-        """
-        filePath = os.path.join(ConfigUtil.parent_dir, 'config', filePath)
-        cfg = configparser.ConfigParser()
-        cfg.read(filePath,encoding='utf-8')
-        configDict = dict(cfg.items(configType))
-        return [item.strip() for item in configDict.values()]
 
     @staticmethod
     def readJsonCourseConfigFile(filePath : str):

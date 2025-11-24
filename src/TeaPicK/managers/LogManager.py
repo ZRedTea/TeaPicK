@@ -3,13 +3,17 @@ import colorlog
 import datetime
 import os
 
-from src.TeaPicK.utils.ConfigUtil import ConfigUtil
+from PyQt6.QtCore import QObject, pyqtSignal as Signal
+from PyQt6.QtWidgets import QTextBrowser
+
+from src.TeaCOPER.GUI.QTextEditLogHandler import QTextEditLogHandler
+from src.TeaCOPER.utils.ConfigUtil import ConfigUtil
 
 CRITI = 50
 ERROR = 40
-WARN  = 35
+WARN = 35
 COMPE = 30
-INFO  = 20
+INFO = 20
 DEBUG = 10
 
 logging.addLevelName(CRITI, "CRITI")
@@ -18,6 +22,7 @@ logging.addLevelName(WARN, "WARN")
 logging.addLevelName(COMPE, "COMPE")
 logging.addLevelName(INFO, "INFO")
 logging.addLevelName(DEBUG, "DEBUG")
+
 
 class MyLogger(logging.Logger):
     """
@@ -51,6 +56,7 @@ class MyLogger(logging.Logger):
         if self.isEnabledFor(DEBUG):
             self._log(DEBUG, msg, args, **kwargs)
 
+
 class TruncateColoredFormatter(colorlog.ColoredFormatter):
     def __init__(self, fmt=None, datefmt=None, style='%', log_colors=None,
                  secondary_log_colors=None, max_filename_length=12, keep_start=3, keep_end=3):
@@ -77,7 +83,9 @@ class TruncateColoredFormatter(colorlog.ColoredFormatter):
 
         return super().format(record)
 
+
 logging.setLoggerClass(MyLogger)
+
 
 def getLogger(name, level=DEBUG, log_format=None):
     """
@@ -113,7 +121,9 @@ def getLogger(name, level=DEBUG, log_format=None):
         normal_handler.setFormatter(normal_formatter)
         normal_handler.setLevel(INFO)
 
-        debug_handler = logging.FileHandler(f"{ConfigUtil.readConfigFile("LogConfig.ini","log-config")["logname"]} {datetime.datetime.now().strftime('%Y-%m-%d')}.log", mode='a')
+        debug_handler = logging.FileHandler(
+            f"{ConfigUtil.readConfigFile("log-config")["logname"]} {datetime.datetime.now().strftime('%Y-%m-%d')}.log",
+            mode='a')
         debug_formatter = TruncateColoredFormatter(
             fmt='[%(asctime)s] <%(filename)-12s>/%(name)-6s > %(levelname)-5s | %(message)s'
         )
@@ -125,19 +135,48 @@ def getLogger(name, level=DEBUG, log_format=None):
 
     return logger
 
-class LogManager():
-    def __init__(self, name : str):
+
+class LogManager(QObject):
+    log_updated = Signal(str, str)  # 日志消息 : 日志等级
+
+    def __init__(self, name: str):
+        super().__init__()
         self.logger = getLogger(name)
+        self.gui_handler = None
+
+    def add_gui_handler(self, text_edit):
+        """添加GUI日志处理器"""
+        if self.gui_handler is None:
+            self.gui_handler = QTextEditLogHandler(text_edit)
+            self.gui_handler.setLevel(logging.INFO)
+            self.logger.addHandler(self.gui_handler)
+
+    def remove_gui_handler(self):
+        """移除GUI日志处理器"""
+        if self.gui_handler:
+            self.logger.removeHandler(self.gui_handler)
+            self.gui_handler = None
 
     def criti(self, msg):
         self.logger.criti(msg)
+        self.log_updated.emit(msg, "CRITI")
+
     def error(self, msg):
         self.logger.error(msg)
+        self.log_updated.emit(msg, "ERROR")
+
     def warn(self, msg):
         self.logger.warn(msg)
+        self.log_updated.emit(msg, "WARN")
+
     def compe(self, msg):
         self.logger.compe(msg)
+        self.log_updated.emit(msg, "COMPE")
+
     def info(self, msg):
         self.logger.info(msg)
+        self.log_updated.emit(msg, "INFO")
+
     def debug(self, msg):
         self.logger.debug(msg)
+        self.log_updated.emit(msg, "DEBUG")
