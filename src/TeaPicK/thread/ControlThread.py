@@ -2,25 +2,27 @@ import threading
 import queue
 import time
 from typing import List, Dict, Any
-from PyQt6.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot
+from PyQt6.QtCore import QObject, pyqtSignal as Signal, pyqtBoundSignal as pyqtSignal
 
 from TeaPicK.manager import LogManager
-from TeaPicK.module import SelectModule
 from TeaPicK.model import Course
 from TeaPicK.thread import WorkerThread
 from TeaPicK.utils import SessionUtil, ConfigUtil
+from TeaPicK.wrapper import *
+from TeaPicK.enums import *
 
 logger = LogManager("控制线程")
 
 class ControlThread(QObject, threading.Thread):
-    course_status_changed = Signal(str, str)   # 课程代码 : 状态
-    worker_status_changed = Signal(int, str)   # 线程号 : 状态
-    process_finished = Signal(int, int)        # 完成数 : 总数
+    course_status_changed : 'pyqtSignal' = Signal(str, str)   # 课程代码 : 状态
+    worker_status_changed : 'pyqtSignal' = Signal(int, str)   # 线程号 : 状态
+    process_finished : 'pyqtSignal' = Signal(int, int)        # 完成数 : 总数
 
     def __init__(self):
         QObject.__init__(self)
         threading.Thread.__init__(self)
         self.daemon = True
+        self.running = False
 
         self.session = SessionUtil.getSession()
 
@@ -31,9 +33,9 @@ class ControlThread(QObject, threading.Thread):
 
         self.resource_lock = threading.Lock()  # 资源锁 : 防止资源抢占
         self.time_lock = threading.Lock()      # 时间锁 : 用于规定最小抢课间隔
+        self.last_work_time = TimeWrapper      # 上次工作时间 : 用于规定最小抢课间隔
 
         self.workers = []
-        self.running = False
         self.course_list = []
 
     def run(self):
@@ -57,8 +59,7 @@ class ControlThread(QObject, threading.Thread):
                 logger.error(e)
 
     def _start_workers(self):
-        from ..module import SelectModule
-        from ..module import LoginModule
+        from TeaPicK.module import LoginModule
 
         # 初始化session
         logger.info("正在获取会话")
@@ -85,11 +86,12 @@ class ControlThread(QObject, threading.Thread):
                 status_queue = self.status_queue,
                 resource_queue = self.resource_queue,
                 resource_lock = self.resource_lock,
-                time_lock = self.time_lock
+                time_lock = self.time_lock,
+                last_work_time = self.last_work_time,
             )
             self.workers.append(worker)
             worker.start()
-            self.worker_status_changed.emit(i,"Waiting")
+            self.worker_status_changed.emit(i,ThreadStatus.WAITING)
 
     def _process_commands(self):
         """处理来自前端的命令"""
@@ -129,14 +131,17 @@ class ControlThread(QObject, threading.Thread):
         # 遍历课程列表
         for course in self.course_list:
             # 创建资源数据包
-            resource = {
-                'type' : 'course',
-                'course' : course,
-                'status' : 'waiting',
-                'order' : -1
-            }
+            with self.resource_lock:
+                # 构建资源
+                resource = {
+                    'type' : 'course',
+                    'course' : course,
+                    'status' : CourseStatus.WAITING,
+                    'order' : -1
+                }
 
-            self.resource_queue.put(resource)
+                # 将资源放入资源队列内
+                self.resource_queue.put(resource)
 
     def _process_worker_status_update(self):
         """处理工作线程状态更新"""
@@ -153,15 +158,15 @@ class ControlThread(QObject, threading.Thread):
     def _handle_status(self, status: Dict[str, Any]):
         """处理单个状态变化"""
         # 获取状态更新类型
-        type = status.get("type")
+        status_change_type = status.get("type")
 
-        if type == "course_status_changed":
+        if status_change_type == "course_status_changed":
             # 若是课程状态更新则交由课程状态信号处理
             course_id = status.get("course_id")
             status = status.get("status")
             self.course_status_changed.emit(course_id, status)
 
-        elif type == "worker_status_changed":
+        elif status_change_type == "worker_status_changed":
             # 若是线程状态更新则交由线程状态信号处理
             worker_id = status.get("worker_id")
             status = status.get("status")
@@ -172,18 +177,33 @@ class ControlThread(QObject, threading.Thread):
         """检查工作线程状态"""
         # 便利所有工作线程
         for i,worker in enumerate(self.workers):
-            # 若出现莫名其妙停止则上报错误
+            # 若出现未知情况停止则上报错误
             if not worker.is_alive():
                 logger.warn("检测到有工作线程异常停止")
-                if worker.course != None:
-                    course = worker.course
-                    self.resource_queue.put(course)
-                self.worker_status_changed.emit(i,"Excepted")
+
+                # 检测该线程停止前是否在抢课
+                if worker.course is not None:
+                    # 若正在抢课则将该课程状态改为等待状态以便其他线程抢课
+                    with self.resource_lock:
+                        resources = self.resource_queue.get()
+                        for resource in resources:
+                            if (resource.get("type") == "course" and
+                                resource.get("order") == i and resource.get("status") == CourseStatus.SELECTING):
+                                resource["status"] = CourseStatus.WAITING
+                                resource["order"] = -1
+                            self.resource_queue.put(resource)
+
+                # 向信号槽发送工作线程改变信号
+                self.worker_status_changed.emit(i, ThreadStatus.EXCEPTED)
+
+                # 尝试重启该工作线程
                 self._restart_worker(i)
 
     def _restart_worker(self, worker_id):
+        """重启工作线程"""
         try:
             logger.info("正在重启异常停止的工作线程")
+            # 创建工作线程
             worker = WorkerThread(
                 worker_id=worker_id,
                 session=self.session,
@@ -191,12 +211,17 @@ class ControlThread(QObject, threading.Thread):
                 status_queue=self.status_queue,
                 resource_queue=self.resource_queue,
                 resource_lock=self.resource_lock,
-                time_lock=self.time_lock
+                time_lock=self.time_lock,
+                last_work_time = self.last_work_time
             )
 
             worker.start()
+
+            # 将工作线程加入工作线程列表
             self.workers[worker_id] = worker
-            self.worker_status_changed.emit(worker_id, "Waiting")
+
+            # 向信号槽发送工作线程改变信号
+            self.worker_status_changed.emit(worker_id, ThreadStatus.WAITING)
             logger.info("重启工作线程成功")
         except Exception as e:
             logger.error(e)
