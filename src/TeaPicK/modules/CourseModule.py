@@ -11,7 +11,7 @@ class CourseModule:
     获取课程列表的模块类
     """
     def __init__(self, session : Session):
-        self.logger = LogManager("课程代码模块")
+        self.logger = LogManager("课程模块")
         self.session = session
 
 
@@ -28,6 +28,8 @@ class CourseModule:
         for course in courseList:
             id = CourseIdUtil.getCourseId(self.session, course)
             course.setCourseId(id)
+            self.logger.info(f"已获取: {course.getCourseName()}({course.getCourseNo()}) : {course.getCourseId()}")
+
 
         return courseList
 

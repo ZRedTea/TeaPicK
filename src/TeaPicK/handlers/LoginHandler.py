@@ -67,7 +67,7 @@ class LoginHandler:
                 lambda driver: driver.current_url != initial_url
             )
 
-            print("检测到页面跳转，登录可能已完成！")
+            self.logger.info("检测到页面跳转，登录可能已完成！")
             return True
 
         except Exception as e:
@@ -89,15 +89,15 @@ class LoginHandler:
 
         # 获取浏览器中的所有cookies
         selenium_cookies = self.driver.get_cookies()
-        print(selenium_cookies)
+        # print(selenium_cookies)
 
         jar = RequestsCookieJar()
         for cookie in selenium_cookies:
             jar.set(cookie["name"], cookie["value"])
         self.session.cookies = jar
-        print(self.session.cookies)
+        # print(self.session.cookies)
 
-        print(f"成功导出 {len(selenium_cookies)} 个cookies到requests Session")
+        self.logger.info(f"成功导出cookies")
         return self.session
 
     def run(self, timeout=300):

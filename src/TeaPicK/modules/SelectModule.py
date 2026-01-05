@@ -1,5 +1,3 @@
-import logging
-
 from src.TeaPicK.models.CourseModel import CourseModel
 from src.TeaPicK.utils.ConfigUtil import ConfigUtil
 
@@ -36,20 +34,20 @@ class SelectModule:
                                style=lambda s: s and 'width:85%' in s and 'text-align:left' in s and 'margin:auto' in s)
 
         if not result_div:
-            print("未找到!")
+            self.logger.warn("未找到对应消息!")
+            self.logger.warn(response.text)
             return 404
 
         result_text = result_div.get_text(strip=True)
 
-        logging.info(result_text)
         if "成功" in result_text:
-            print(f"抢课成功!")
+            self.logger.compe(f"抢课成功!")
             return 200
         else:
             if "已经选过" in result_text:
-                print(f"已经选过!")
+                self.logger.info(f"已经选过!")
                 return 201
-            print(f"抢课失败!原因:{result_text}")
+            self.logger.info(f"抢课失败!原因:{result_text}")
             return 400
 
     def SelectMethod(self, course : CourseModel, retry_count = 1):
@@ -64,7 +62,7 @@ class SelectModule:
         }
 
         try:
-            print(f"第 {retry_count} 次尝试选课 {course.getCourseName()}")
+            self.logger.info(f"第 {retry_count} 次尝试选课 {course.getCourseName()}")
 
             with self.timelock:
                 elapsed = time.time() - self.lasttime
@@ -85,7 +83,7 @@ class SelectModule:
             if retry_count < 3:
                 return self.SelectMethod(course, retry_count + 1)
             else:
-                print(f"发生错误{e}")
+                self.logger.criti(f"发生错误{e}")
                 return False
 
 
@@ -94,9 +92,9 @@ class SelectModule:
             course = self.courseList.pop()
             status = self.SelectMethod(course)
             if status:
-                print(f"{course} 抢课成功")
+                self.logger.compe(f"{course} 抢课成功")
             else:
-                print(f"{course} 抢课失败，正在重试")
+                self.logger.info(f"{course} 抢课失败，正在重试")
                 self.courseList.append(course)
                 time.sleep(self.interval)
 
