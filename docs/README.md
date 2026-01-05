@@ -5,7 +5,7 @@
 <img src="https://img.shields.io/badge/Python-3.12-blue" />
 <img src="https://img.shields.io/badge/Platform-Windows-yellow" />
 <img src="https://img.shields.io/badge/License-MIT-red" />
-<img src="https://img.shields.io/badge/Version-0.2.1-purple" />
+<img src="https://img.shields.io/badge/Version-0.3.1-purple" />
 
 </div>
 
@@ -59,14 +59,12 @@ uv sync
 > Linux环境
 ```BASH
 cd src/TeaPicK/config
-nano userConfig.ini
 nano courseList.json
 ```
 
 > Windows环境
 ```BASH
 cd src/TeaPicK/config
-notepad userConfig.ini
 code courseList.json # VS Code
 ```
 
