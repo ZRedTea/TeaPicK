@@ -1,6 +1,6 @@
 [project]
 name = "TeaPicK"
-version = "0.3.1"
+version = "1.0.0"
 requires-python = ">=3.12"
 dependencies = [
     "bs4>=0.0.2",
@@ -9,3 +9,10 @@ dependencies = [
     "selenium>=4.39.0",
     "webdriver-manager>=4.0.2",
 ]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+build = ["pyinstaller>=6.0.0", "pyinstaller-hooks-contrib"]

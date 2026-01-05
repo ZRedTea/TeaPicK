@@ -1,8 +1,24 @@
 {
     "course": {
         "course1": {
-            "courseName": "课程1",
-            "courseNo": "25262.02120004-1.05"
+            "courseName": "嵌入式系统与应用",
+            "courseNo": "25262.28120190-3.09"
+        },
+        "course2": {
+            "courseName": "UML面向对象分析与设计",
+            "courseNo": "25262.28130300-1.5.04"
+        },
+        "course3": {
+            "courseName": "JavaEE企业级项目开发",
+            "courseNo": "25262.28130720-2.05"
+        },
+        "course4": {
+            "courseName": "创办小企业",
+            "courseNo": "25262.20110030-2.06"
+        },
+        "course5": {
+            "courseName": "软件项目管理",
+            "courseNo": "25262.28130730-2.03"
         }
     }
 }
