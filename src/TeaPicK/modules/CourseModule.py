@@ -23,6 +23,8 @@ class CourseModule:
 
         courseList = ConfigUtil.readJsonCourseConfigFile("courseList.json")
 
+        CourseIdUtil.getCourseJson(self.session)
+
         for course in courseList:
             id = CourseIdUtil.getCourseId(self.session, course)
             course.setCourseId(id)

@@ -19,7 +19,6 @@ class SelectModule:
         self.url = ConfigUtil.readConfigFile("websiteConfig.ini", "website")["courseselecturl"]
         self.profile = ConfigUtil.readConfigFile("websiteConfig.ini", "website")["profile"]
 
-        self.url = self.url + self.profile
         self.logger.debug("获取到的抢课api链接为" + self.url)
         self.session.headers["Referer"] = "https://jwxt.sias.edu.cn/eams/stdElectCourse!defaultPage.action?electionProfile.id="+self.profile
         self.interval = interval
@@ -73,6 +72,7 @@ class SelectModule:
                     time.sleep(self.interval - elapsed)
                 self.lasttime = time.time()
             response = self.session.post(self.url, data=data, params=params)
+            # print(response.text)
             result = self.isSuccess(response)
             if result == 400 or result == 404:
                 if retry_count < 3:
