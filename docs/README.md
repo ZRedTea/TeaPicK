@@ -5,7 +5,7 @@
 <img src="https://img.shields.io/badge/Python-3.12-blue" />
 <img src="https://img.shields.io/badge/Platform-Windows-yellow" />
 <img src="https://img.shields.io/badge/License-MIT-red" />
-<img src="https://img.shields.io/badge/Version-0.3.1-purple" />
+<img src="https://img.shields.io/badge/Version-1.0.0-purple" />
 
 </div>
 
@@ -20,10 +20,10 @@ TeaPicK 是一款基于Python的效率工具。用于节省学生们在这方面
 ## ⚙️ 系统功能
 
 ### 🔌 模拟登录
-TeaPicK 可以不需要再手动登录，只需要在配置中输入自己的账号密码即可实现自动登录系统
+TeaPicK 可以模拟登录，不需要手动输入cookies等
 
 ### 🔗 获取课程
-TeaPicK 可以根据配置文件获取你需要的课程，来实现业务
+TeaPicK 可以根据配置文件获取你需要的课程，来实现业务处理
 
 ### 🧮 线程并发
 TeaPicK 可以实现最大8线程的同时进行业务，提高业务效率
@@ -32,7 +32,6 @@ TeaPicK 可以实现最大8线程的同时进行业务，提高业务效率
 
 ## 🚧 施工计划
 
-- 修复模拟登陆中的问题
 - 使用PyQt6实现GUI
 
 ---
@@ -59,13 +58,15 @@ uv sync
 > Linux环境
 ```BASH
 cd src/TeaPicK/config
-nano courseList.json
+nano websiteConfig.ini #修改profileId
+nano courseList.json #修改课程列表
 ```
 
 > Windows环境
 ```BASH
 cd src/TeaPicK/config
-code courseList.json # VS Code
+code websiteConfig.ini #修改profileId
+code courseList.json #修改课程列表
 ```
 
 ### 🔧 启动项目
