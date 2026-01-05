@@ -1,6 +1,6 @@
 [project]
 name = "TeaPicK"
-version = "0.2.1"
+version = "0.3.1"
 requires-python = ">=3.12"
 dependencies = [
     "bs4>=0.0.2",
