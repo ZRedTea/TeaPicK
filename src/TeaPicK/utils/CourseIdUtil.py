@@ -8,51 +8,43 @@ from src.TeaPicK.utils.ConfigUtil import ConfigUtil
 from src.TeaPicK.models.CourseModel import CourseModel
 
 class CourseIdUtil:
+
+    # AI太好用了你们知道吗 正则表达式太好用了你们知道吗
     @staticmethod
-    def findCourseId(filename, search_text):
+    def find_id_by_no(data_string, target_no):
         """
-        在文件中搜索文本，找到时返回上一行的内容
+        从类似JSON的字符串中根据no字段查找对应的id值
+
+        Args:
+            data_string: 包含多个对象的字符串
+            target_no: 要查找的no值，如 '25262.02120004-1.05'
+
+        Returns:
+            str: 找到的id值，如果没找到返回None
         """
-        try:
-            with open(filename, 'r', encoding='utf-8') as file:
-                previous_line = None
-                current_line = None
+        # 方法1：使用正则表达式直接匹配
+        # 匹配模式：id:数字,no:'目标编号'
+        pattern = r"id:(\d+),no:'" + re.escape(target_no) + r"'"
+        match = re.search(pattern, data_string)
 
-                for line in file:
-                    current_line = line.strip()
+        if match:
+            return match.group(1)
 
-                    if search_text in current_line:
-                        if previous_line is not None:
-                            match = re.search(r'(\d+)', previous_line)
-                            if match:
-                                return match.group(1)
-                            return None
-                        else:
-                            return "这是第一行，没有上一行"
+        # 方法2：如果方法1没找到，尝试更灵活的匹配
+        # 匹配模式：id:数字,no:'任意字符'，然后检查no是否匹配目标
+        pattern2 = r"id:(\d+),no:'([^']+)'"
+        matches = re.findall(pattern2, data_string)
 
-                    previous_line = current_line
+        for id_val, no_val in matches:
+            if no_val == target_no:
+                return id_val
 
-                return f"未找到包含 '{search_text}' 的行"
-
-        except FileNotFoundError:
-            return f"文件不存在: {filename}"
-        except Exception as e:
-            return f"读取文件时出错: {e}"
-
-
-
-        except json.JSONDecodeError as e:
-            print(f"JSON解析错误: {e}")
-            return None
-        except Exception as e:
-            print(f"其他错误: {e}")
-            return None
+        return None
 
     @staticmethod
     def getCourseJson(session : Session):
         url = ConfigUtil.readConfigFile("websiteConfig.ini", "website")["coursedataurl"]
         profileId = ConfigUtil.readConfigFile("websiteConfig.ini", "website")["profile"]
-        url = url + profileId
 
         ThisSession = session
         ThisSession.headers['Referer'] = url
@@ -75,7 +67,11 @@ class CourseIdUtil:
             print("未找到文件")
             raise Exception("未找到文件")
 
-        id = CourseIdUtil.findCourseId("course_data.action", courseNo)
+        with open(f"course_data.action", "r", encoding="utf-8") as f:
+            courseData = f.read()
+
+        id = CourseIdUtil.find_id_by_no(courseData, courseNo)
+
         return id
 
 
