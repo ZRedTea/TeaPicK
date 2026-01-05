@@ -13,7 +13,12 @@ def run():
     logger = LogManager("中央控件")
 
     logger.info("正在准备模拟登录")
-    LoginModuleObject = LoginModule()
+    userInput = input("请选择使用Chrome或是Edge(输入1选择Chrome, 2选择Edge):")
+    if userInput == "1":
+        browser_type = "chrome"
+    else:
+        browser_type = "edge"
+    LoginModuleObject = LoginModule(browser_type)
     session = LoginModuleObject.login()
     logger.info("模拟登录完成")
 

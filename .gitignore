@@ -1,3 +1,8 @@
 .idea
-
+build
+dist
 test
+
+*.txt
+*.7z
+*.spec

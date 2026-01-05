@@ -1,4 +1,5 @@
 import time
+from webbrowser import Chrome
 
 from requests.cookies import RequestsCookieJar
 from selenium import webdriver
@@ -7,22 +8,41 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.edge.options import Options as EdgeOptions
+
 import requests
 import json
+import os
+import sys
 
 from src.TeaPicK.managers.LogManager import LogManager
 
 class LoginHandler:
-    def __init__(self, login_url):
+    def __init__(self, login_url, browser_type="chrome"):
         self.logger = LogManager("登录处理")
         self.login_url = login_url
+        self.browser_type = browser_type.lower()
         self.driver = None
         self.session = None
 
+        self.path = os.path.dirname(sys.executable)
+
     def setup_driver(self):
+        if self.browser_type == "chrome":
+            self._setup_chrome_driver()
+        elif self.browser_type == "edge":
+            self._setup_edge_driver()
+        else:
+            raise ValueError(f"不支持的浏览器类型: {self.browser_type}")
+
+    def _setup_chrome_driver(self):
         """设置Chrome浏览器驱动"""
-        options = webdriver.ChromeOptions()
+        options = ChromeOptions()
 
         # 添加一些常用选项
         options.add_argument('--no-sandbox')
@@ -32,11 +52,39 @@ class LoginHandler:
         options.add_experimental_option('useAutomationExtension', False)
 
         # 使用webdriver-manager自动管理驱动
-        service = Service(ChromeDriverManager().install())
+        if not os.path.exists("chromedriver.exe"):
+            service = ChromeService(ChromeDriverManager().install())
+        else:
+            service = ChromeService(executable_path="chromedriver.exe")
         self.driver = webdriver.Chrome(service=service, options=options)
 
         # 修改webdriver属性，避免被检测
         self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+
+        self.logger.info("Chrome浏览器驱动已设置")
+
+    def _setup_edge_driver(self):
+        """设置Edge浏览器驱动"""
+        options = EdgeOptions()
+
+        # 添加一些常用选项
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--disable-blink-features=AutomationControlled')
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
+
+        # 使用webdriver-manager自动管理驱动
+        if not os.path.exists("msedgedriver.exe"):
+            service = EdgeService(EdgeChromiumDriverManager().install())
+        else:
+            service = EdgeService(executable_path="msedgedriver.exe")
+        self.driver = webdriver.Edge(service=service, options=options)
+
+        # 修改webdriver属性，避免被检测
+        self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+
+        self.logger.info("Edge浏览器驱动已设置")
 
     def wait_for_login(self, timeout=300):
         """

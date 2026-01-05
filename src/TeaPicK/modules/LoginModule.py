@@ -12,12 +12,12 @@ class LoginModule:
     [模块类]
     实现模拟登录的模块类
     """
-    def __init__(self):
+    def __init__(self, browser_type):
         self.logger = LogManager("登录模块")
         self.session = Session
         self.url = ConfigUtil.readConfigFile("websiteConfig.ini", "website")["loginurl"]
 
-        self.loginHandler = LoginHandler(self.url)
+        self.loginHandler = LoginHandler(self.url, browser_type)
 
     def login(self):
         """
